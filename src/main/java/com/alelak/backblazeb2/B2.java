@@ -4,7 +4,6 @@ import com.alelak.backblazeb2.models.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.squareup.okhttp.*;
-import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +30,6 @@ public class B2 {
     public B2(final String accountId, final String applicationKey) {
         gson = new Gson();
         client = new OkHttpClient();
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        client.interceptors().add(logging);
         Request request = new Request.Builder()
                 .url(Constants.AUTHORIZATION_URL)
                 .addHeader("Accept", "application/json")
@@ -55,6 +51,8 @@ public class B2 {
      * Used to log in to the B2 API.
      * Returns an authorization token that can be used for account-level operations,
      * and a URL that should be used as the base URL for subsequent API calls.
+     *
+     * @return B2Info instance
      */
     public B2Info getInfo() {
         return info;
