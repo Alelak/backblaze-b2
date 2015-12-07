@@ -35,10 +35,10 @@ B2 b2 = new B2(accountId, applicationKey);
 ```
 
 Create Bucket:
-```
+```java
 B2Bucket bucket = new B2Bucket();
 bucket.setBucketName("music"); //bucket names are unique
-bucket.setBucketType(B2.BUCKET_TYPE_PRIVATE); //public or private
+bucket.setBucketType(b2.BUCKET_TYPE_PRIVATE); //public or private
 b2.createBucket(bucket);
 ```
 
