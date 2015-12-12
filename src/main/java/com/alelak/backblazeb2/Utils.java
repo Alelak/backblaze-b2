@@ -1,26 +1,40 @@
 package com.alelak.backblazeb2;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.Base64;
 
 public class Utils {
 
 
     public static String getFileSha1Hash(File file) {
-        FileInputStream fileInputStream = null;
+        InputStream in = null;
         String sha1Hash = null;
         try {
-            fileInputStream = new FileInputStream(file);
-            sha1Hash = DigestUtils.sha1Hex(fileInputStream);
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+            in = new FileInputStream(file);
+            byte[] buffer = new byte[8192];
+            int len = in.read(buffer);
 
+            while (len != -1) {
+                sha1.update(buffer, 0, len);
+                len = in.read(buffer);
+            }
+
+            sha1Hash = new HexBinaryAdapter().marshal(sha1.digest());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            IOUtils.closeQuietly(fileInputStream);
+            try {
+                if (in != null)
+                    in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return sha1Hash;
     }
