@@ -1,5 +1,6 @@
 package com.alelak.backblazeb2;
 
+import com.alelak.backblazeb2.listeners.ProgressRequestBody;
 import com.alelak.backblazeb2.models.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -240,6 +241,35 @@ public class B2 {
             Request request = new Request
                     .Builder()
                     .method("POST", RequestBody.create(MediaType.parse(Files.probeContentType(file.toPath())), file))
+                    .url(b2UploadInfo.getUploadUrl())
+                    .addHeader("Authorization", b2UploadInfo.getAuthorizationToken())
+                    .addHeader("X-Bz-File-Name", file.getName())
+                    .addHeader("X-Bz-Content-Sha1", Utils.getFileSha1Hash(file)).build();
+            Response response = client.newCall(request).execute();
+            if (response.isSuccessful() && response.body() != null) {
+                b2File = gson.fromJson(response.body().string(), B2File.class);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return b2File;
+    }
+
+    /**
+     * Uploads one file to B2 with progress information, returning its unique file ID.
+     *
+     * @param file             The file to upload
+     * @param b2UploadInfo     Upload Info returned by {@link #getUploadInfo(String)}.
+     * @param progressListener For checking upload progress.
+     * @return Information about the uploaded file
+     * @see <a href="hhttps://www.backblaze.com/b2/docs/b2_upload_file.html">Upload File</a>
+     */
+    public B2File uploadFile(File file, B2UploadInfo b2UploadInfo, ProgressRequestBody.ProgressListener progressListener) {
+        B2File b2File = null;
+        try {
+            Request request = new Request
+                    .Builder()
+                    .method("POST", new ProgressRequestBody(RequestBody.create(MediaType.parse(Files.probeContentType(file.toPath())), file), progressListener))
                     .url(b2UploadInfo.getUploadUrl())
                     .addHeader("Authorization", b2UploadInfo.getAuthorizationToken())
                     .addHeader("X-Bz-File-Name", file.getName())

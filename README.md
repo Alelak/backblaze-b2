@@ -21,7 +21,7 @@ Dependecy:
 	<dependency>
 	    <groupId>com.github.Alelak</groupId>
 	    <artifactId>backblaze-b2</artifactId>
-	    <version>1.0.2</version>
+	    <version>1.1.0</version>
 	</dependency>
 ```
 
@@ -52,6 +52,16 @@ Upload File:
 File fileToUpload = new File("path/to/somewhere");
 b2.uploadFile(fileToUpload, uploadInfo);
 
+```
+Upload File With Progress:
+```java
+File fileToUpload = new File("path/to/somewhere");
+b2.uploadFile(fileToUpload, uploadInfo, new ProgressRequestBody.ProgressListener() {
+    @Override
+    public void onProgress(long bytesWritten, long contentLength, boolean done) {
+        //update ui
+    }
+});
 ```
 
 Check source code and [official docs](https://www.backblaze.com/b2/docs/) for more information.
